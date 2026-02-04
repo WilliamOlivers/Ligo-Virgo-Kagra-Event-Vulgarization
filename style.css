@@ -1,0 +1,93 @@
+:root {
+    --bg-color: #f4f4f0; /* Papier blanc cassé */
+    --text-color: #1a1a1a;
+    --accent-color: #3d5afe; /* Bleu électrique subtil */
+    --card-bg: #ffffff;
+    --border: 1px solid #e0e0e0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    border-bottom: var(--border);
+    font-family: 'Space Mono', monospace;
+}
+
+.blink {
+    animation: blinker 1.5s linear infinite;
+    color: green;
+    font-weight: bold;
+}
+
+@keyframes blinker { 50% { opacity: 0; } }
+
+main {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+
+.event-card {
+    background: var(--card-bg);
+    border: var(--border);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.05); /* Ombre dure minimaliste */
+    transition: transform 0.2s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
+}
+
+.meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+h2 {
+    font-family: 'Space Mono', monospace;
+    margin: 0.5rem 0 1rem 0;
+    font-size: 1.5rem;
+}
+
+.score-bar {
+    height: 4px;
+    background: #eee;
+    margin-top: 1.5rem;
+    position: relative;
+}
+
+.score-fill {
+    height: 100%;
+    background: var(--accent-color);
+    display: block;
+}
+
+.raw-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: var(--accent-color);
+    border-bottom: 1px solid transparent;
+}
+
+.raw-link:hover {
+    border-bottom-color: var(--accent-color);
+}

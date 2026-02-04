@@ -20,20 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 card.innerHTML = `
                     <div class="meta">
-                        <span>ID: ${event.id}</span>
-                        <span>${dateStr}</span>
+                        <span class="badge ${event.type}">${event.type}</span>
+                        <span>${event.readable_date}</span>
                     </div>
                     <h2>${event.title}</h2>
-                    <p>${event.summary}</p>
+                    <p class="summary">${event.summary}</p>
                     
-                    <div class="score-container">
-                        <small>Intérêt scientifique: ${event.score}/10</small>
-                        <div class="score-bar">
-                            <span class="score-fill" style="width: ${event.score * 10}%"></span>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="label">ID Catalogue</span>
+                            <span class="value">${event.id}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Intérêt Sc.</span>
+                            <span class="value">${event.score}/10</span>
                         </div>
                     </div>
                     
-                    <a href="https://gracedb.ligo.org/superevents/${event.id}/view/" target="_blank" class="raw-link">Voir données brutes &rarr;</a>
+                    <a href="https://gracedb.ligo.org/superevents/${event.id}/view/" target="_blank" class="raw-link">Source GraceDB &rarr;</a>
                 `;
                 
                 feed.appendChild(card);

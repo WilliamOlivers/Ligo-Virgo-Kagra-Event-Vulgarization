@@ -21,73 +21,88 @@ def load_existing_data():
             return []
 
 def fetch_gracedb_events():
-    # Headers pour éviter d'être bloqué comme un "bot" basique
-    headers = {
-        'User-Agent': 'MyGWProject/1.0 (Educational; contact@example.com)'
-    }
-    # On ajuste la query pour être sûr
-    params = {'query': 'category: Production', 'count': 10, 'order': '-created'}
+    headers = {'User-Agent': 'GrokipediaGW/1.0 (Educational)'}
+    # On cherche les événements confirmés (category: Production)
+    params = {'query': 'category: Production', 'count': 5, 'order': '-created'}
     
     print(f"Connexion à {GRACEDB_URL}...")
     try:
         response = requests.get(GRACEDB_URL, params=params, headers=headers)
-        print(f"Status Code: {response.status_code}")
-        
         if response.status_code == 200:
             data = response.json()
-            
-            # --- BLOC DE DÉBOGAGE ---
-            # Si 'results' n'est pas là, on affiche les clés disponibles pour comprendre
-            if isinstance(data, dict) and 'results' not in data:
-                print(f"ATTENTION: Pas de clé 'results'. Clés reçues : {list(data.keys())}")
-                # Parfois l'API renvoie 'superevents' au lieu de 'results'
-                if 'superevents' in data:
-                    return data['superevents']
-            
-            # Si c'est directement une liste (cas rare mais possible)
-            if isinstance(data, list):
-                return data
-                
-            return data.get('results', [])
+            return data.get('superevents', data.get('results', []))
         else:
             print(f"Erreur API: {response.text}")
             return []
-            
     except Exception as e:
-        print(f"Exception lors du fetch: {e}")
+        print(f"Erreur Fetch: {e}")
         return []
 
+def get_event_details(event_self_url):
+    """
+    Va chercher les détails spécifiques (probabilités) qui ne sont pas toujours
+    dans la liste principale.
+    """
+    try:
+        response = requests.get(event_self_url, headers={'User-Agent': 'GrokipediaGW/1.0'})
+        if response.status_code == 200:
+            return response.json()
+    except:
+        pass
+    return {}
+
 def vulgarize_event(event):
-    """Utilise OpenAI pour expliquer l'événement."""
-    
-    # Sécurité si l'event est mal formé
-    if not event or 'superevent_id' not in event:
-        return None
-
     evt_id = event['superevent_id']
+    
+    # 1. Récupération des détails pour avoir les probabilités (BBH, BNS, etc.)
+    # L'API GraceDB met souvent ces infos dans un champ 'labels' ou il faut parser les fichiers logs.
+    # Pour simplifier ici, nous allons donner le maximum de contexte brut à OpenAI.
+    
     labels = event.get('labels', [])
-    # Gestion sécurisée des liens
-    link = event.get('links', {}).get('self', 'N/A')
-    far = event.get('far', 'N/A') 
+    far = event.get('far', 'Inconnu')
+    instruments = event.get('instruments', 'Inconnu')
     
-    print(f"Vulgarisation en cours pour {evt_id}...")
+    # Tentative d'extraire des infos implicites des labels (ex: ADVNO = pas d'événement astrophysique)
+    context_str = f"ID: {evt_id}, Labels: {labels}, FAR: {far}, Instruments: {instruments}"
+    
+    print(f"--- Analyse scientifique de {evt_id} ---")
 
+    # LE PROMPT "SCIENTIFIC DECODER"
     prompt = f"""
-    Agis comme un expert en astrophysique et vulgarisation.
-    Voici une détection d'onde gravitationnelle (ID: {evt_id}) :
-    - Labels: {', '.join(labels)}
-    - FAR: {far}
+    Tu es un astrophysicien spécialisé dans l'analyse des ondes gravitationnelles.
+    Ta mission : Décoder les métadonnées brutes de GraceDB pour créer une fiche technique claire et pédagogique.
     
-    Tâche :
-    1. Titre accrocheur en Français.
-    2. Résumé (max 60 mots) en Français simple (niveau collège).
-    3. Score d'excitation (1-10).
+    Données brutes :
+    {context_str}
+
+    CONSIGNES STRICTES DE RÉDACTION :
+    1.  **Titre** : Pas de clickbait. Utilise le format : "Type d'événement probable (Date)". 
+        - Exemple si BBH : "Coalescence de Trous Noirs (14 Août 2023)"
+        - Exemple si BNS : "Fusion d'Étoiles à Neutrons (14 Août 2023)"
+        - Si incertain ou "Terrestrial" : "Signal Non Classifié / Bruit probable"
     
-    Réponds uniquement au format JSON valide :
+    2.  **Type de Source (Décodage)** : Analyse les labels/ID.
+        - Si tu vois 'BBH' ou labels similaires -> Explique que ce sont deux trous noirs.
+        - Si tu vois 'BNS' -> Explique étoiles à neutrons.
+        - Si 'MassGap' -> Explique l'objet mystère.
+        - Si le FAR est élevé (ex: 1 fois par mois) -> Précise que c'est probablement du bruit.
+        
+    3.  **La Distance/Temps** : 
+        - Décode l'ID (SYYMMDD) pour donner la date exacte en toutes lettres en Français.
+        - Explique que le signal a voyagé depuis une galaxie lointaine (si astrophysique).
+    
+    4.  **Résumé Technique** : 
+        - Utilise un ton encyclopédique (neutre, précis).
+        - Explique ce que les instruments (H1, L1, V1) ont ressenti (une vibration de l'espace-temps inférieure à la taille d'un atome).
+        - Évite les analogies enfantines ("c'est comme une vague"). Préfère "une perturbation de la métrique de l'espace-temps".
+
+    Réponds UNIQUEMENT via ce JSON :
     {{
-        "title": "...",
-        "summary": "...",
-        "excitement_score": 0
+        "title": "Titre Scientifique",
+        "event_type": "BBH / BNS / NSBH / Terrestrial",
+        "date_readable": "14 Octobre 2023",
+        "description": "Paragraphe explicatif de 50 mots max, style encyclopédie.",
+        "scientific_score": (note de 1 à 10 basée sur la rareté. BBH=5, BNS=9, Terrestrial=1)
     }}
     """
 
@@ -95,46 +110,40 @@ def vulgarize_event(event):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
+            response_format={"type": "json_object"},
+            temperature=0.2 # Température basse pour être factuel
         )
-        content = response.choices[0].message.content
-        return json.loads(content)
+        return json.loads(response.choices[0].message.content)
     except Exception as e:
-        print(f"Erreur OpenAI sur {evt_id}: {e}")
+        print(f"Erreur OpenAI: {e}")
         return None
 
 def main():
     existing_data = load_existing_data()
-    # Création d'un set d'IDs existants pour éviter les doublons
     existing_ids = {entry['id'] for entry in existing_data if 'id' in entry}
     
     raw_events = fetch_gracedb_events()
-    
-    if not raw_events:
-        print("Aucun événement récupéré. Fin du script.")
-        return
-
     new_entries = []
-    print(f"Events trouvés sur GraceDB : {len(raw_events)}")
 
     for event in raw_events:
-        # Vérification de sécurité
-        if 'superevent_id' not in event:
-            continue
-            
         evt_id = event['superevent_id']
         
         if evt_id not in existing_ids:
+            # On ignore les événements marqués "Retracted" dans les labels si on veut être puriste
+            # mais on laisse l'IA juger pour l'instant.
+            
             vulgarized = vulgarize_event(event)
             
             if vulgarized:
                 new_entry = {
                     "id": evt_id,
-                    "date": event.get('created', datetime.now().isoformat()),
-                    "url": event.get('links', {}).get('self', ''),
-                    "title": vulgarized.get('title', 'Événement Inconnu'),
-                    "summary": vulgarized.get('summary', 'Pas de résumé disponible'),
-                    "score": vulgarized.get('excitement_score', 5)
+                    "date": event['created'],
+                    "title": vulgarized.get('title'),
+                    "type": vulgarized.get('event_type'), # Nouveau champ
+                    "readable_date": vulgarized.get('date_readable'), # Nouveau champ
+                    "summary": vulgarized.get('description'),
+                    "score": vulgarized.get('scientific_score', 1),
+                    "url": event['links']['self']
                 }
                 new_entries.append(new_entry)
     
@@ -143,9 +152,9 @@ def main():
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
             json.dump(updated_data, f, indent=2)
-        print(f"SUCCÈS : {len(new_entries)} nouveaux événements ajoutés.")
+        print(f"Ajout de {len(new_entries)} fiches techniques.")
     else:
-        print("Aucun nouvel événement à traiter.")
+        print("Base de données à jour.")
 
 if __name__ == "__main__":
     main()

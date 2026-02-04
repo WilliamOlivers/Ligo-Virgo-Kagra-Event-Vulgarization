@@ -91,3 +91,42 @@ h2 {
 .raw-link:hover {
     border-bottom-color: var(--accent-color);
 }
+/* Ajout pour les badges de type */
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Couleurs spécifiques selon le type (géré par la classe ajoutée en JS) */
+.badge.BBH { background-color: #e0e0e0; color: #333; border: 1px solid #999; } /* Trous noirs = sombre/neutre */
+.badge.BNS { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; } /* Neutrons = Or (Kilonova) */
+.badge.Terrestrial { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; } /* Bruit = Rouge */
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item .label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.detail-item .value {
+    font-family: 'Space Mono', monospace;
+    font-weight: bold;
+}

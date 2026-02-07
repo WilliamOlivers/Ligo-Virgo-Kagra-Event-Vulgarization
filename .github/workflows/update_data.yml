@@ -15,6 +15,9 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
+      with:
+        # C'est ici la magie : on utilise ton Token perso
+        token: ${{ secrets.MY_PA_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v4

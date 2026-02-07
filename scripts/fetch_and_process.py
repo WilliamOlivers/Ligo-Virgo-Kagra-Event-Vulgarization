@@ -20,20 +20,35 @@ def load_existing_data():
         except json.JSONDecodeError:
             return []
 
+def get_voevent_text(evt_id, voevents_url):
+    """
+    Récupère le contenu XML de la dernière alerte VOEvent pour extraire la distance.
+    """
+    try:
+        # 1. Récupérer la liste des fichiers VOEvent
+        r = requests.get(voevents_url, headers={'User-Agent': 'GrokipediaGW/1.0'})
+        if r.status_code != 200: return ""
+        
+        voevents = r.json().get('voevents', [])
+        if not voevents: return ""
+        
+        # 2. Prendre le plus récent (trié par 'sort_order' ou le dernier de la liste)
+        # Les alertes s'appellent souvent 'Initial', 'Update', etc. On prend la dernière.
+        latest_voevent = voevents[-1] 
+        file_url = latest_voevent['links']['file']
+        
+        # 3. Télécharger le contenu XML
+        xml_r = requests.get(file_url, headers={'User-Agent': 'GrokipediaGW/1.0'})
+        if xml_r.status_code == 200:
+            return xml_r.text[:5000] # On tronque pour ne pas saturer le prompt (la distance est au début)
+    except Exception as e:
+        print(f"Erreur VOEvent pour {evt_id}: {e}")
+    return ""
+
 def fetch_gracedb_events():
-    headers = {
-        'User-Agent': 'GrokipediaGW/1.0 (Educational)',
-        'Accept': 'application/json'
-    }
-    
-    # Requête simple et robuste
+    headers = {'User-Agent': 'GrokipediaGW/1.0', 'Accept': 'application/json'}
     query = 'category: Production label: GCN_PRELIM_SENT'
-    
-    params = {
-        'query': query,
-        'count': 15,
-        'order': '-created'
-    }
+    params = {'query': query, 'count': 15, 'order': '-created'}
     
     print(f"Connexion à GraceDB...")
     try:
@@ -42,17 +57,13 @@ def fetch_gracedb_events():
             data = response.json()
             events = data.get('superevents', data.get('results', []))
             
-            # Filtrage basique (O4 + Pas de Rétractation)
             valid_events = []
             for evt in events:
                 labels = evt.get('labels', [])
                 created = evt.get('created', '')
-                
                 if 'RETRACTION' in labels: continue
-                if created < "2023-05-24": continue # Début O4
-                
+                if created < "2023-05-24": continue 
                 valid_events.append(evt)
-            
             return valid_events
         return []
     except Exception as e:
@@ -62,37 +73,37 @@ def fetch_gracedb_events():
 def vulgarize_event(event):
     evt_id = event['superevent_id']
     labels = event.get('labels', [])
-    far = event.get('far', 'Non spécifié')
     
-    print(f">>> Vulgarisation de {evt_id}...")
+    # --- NO STRESS ---
+    # On va chercher le fichier XML technique pour que l'IA puisse lire la distance exacte
+    voevents_url = event['links']['voevents']
+    xml_context = get_voevent_text(evt_id, voevents_url)
+    
+    print(f">>> Vulgarisation de {evt_id} (Recherche distance)...")
 
-    # --- LE TUTORIEL INTÉGRÉ AU PROMPT ---
     prompt = f"""
-    Tu es un expert en astrophysique et communication scientifique.
+    Tu es un expert en astrophysique.
     
     CONTEXTE :
-    Tu dois analyser une onde gravitationnelle identifiée par l'ID : "{evt_id}".
-    Labels associés : {labels}
-    FAR (Fausse Alarme) : {far}
-
-    TUTORIEL POUR DÉCODER LA DATE (IMPORTANT) :
-    Les IDs GraceDB contiennent la date cachée. Format : [Prefix][YYMMDD][Suffix].
-    1. Ignore le préfixe (S, GW, MS...).
-    2. Prends les 6 premiers chiffres : ce sont YYMMDD.
-    3. Si YY est entre 00 et 79, l'année est 20YY. (Ex: 23 = 2023).
-    4. Convertis MM en nom de mois français.
+    Onde gravitationnelle ID : "{evt_id}".
+    Labels : {labels}
     
-    EXEMPLES :
-    - ID "S190425z" -> 190425 -> 25 Avril 2019.
-    - ID "GW170817" -> 170817 -> 17 Août 2017.
-    - ID "S230518h" -> 230518 -> 18 Mai 2023.
+    EXTRAIT FICHIER TECHNIQUE (XML VOEvent) :
+    \"\"\"{xml_context}\"\"\"
 
-    TACHE À RÉALISER (JSON) :
-    1. "title" : Crée un titre au format "Type d'événement (Date Décodée)". Ex: "Fusion de Trous Noirs (14 Mai 2023)".
-    2. "event_type" : Déduis le type (BBH, BNS, NSBH) d'après les labels ou la nature probable.
-    3. "date_readable" : La date que tu as décodée (ex: "14 Mai 2023").
-    4. "description" : Résumé de 40 mots max. Scientifique, précis, impactant.
-    5. "scientific_score" : Note d'importance /10 (BBH=6, BNS=9, Exceptionnel=10).
+    TUTORIEL DATE :
+    ID Format [Prefix][YYMMDD][Suffix]. 
+    S230518h -> 230518 -> 18 Mai 2023.
+
+    TACHE (JSON) :
+    1. "title" : "Type (Date Décodée)". Ex: "Fusion de Trous Noirs (14 Mai 2023)".
+    2. "event_type" : BBH, BNS, NSBH (déduit des labels ou du XML).
+    3. "date_readable" : La date décodée.
+    4. "description" : Résumé 40 mots max.
+    5. "distance" : Cherche la valeur "Distance" dans le XML (souvent en Mpc).
+       - Si tu la trouves, convertis-la approximativement en Milliards ou Millions d'années-lumière (1 Mpc = 3.26 Millions AL).
+       - Affiche le résultat sous forme de texte court. Ex: "1.2 Milliards d'AL" ou "400 Millions d'AL".
+       - Si introuvable, mets "Inconnue".
 
     Réponds UNIQUEMENT via ce JSON :
     {{
@@ -100,18 +111,16 @@ def vulgarize_event(event):
         "event_type": "...",
         "date_readable": "...",
         "description": "...",
-        "scientific_score": 0
+        "distance": "..."
     }}
     """
 
     try:
         response = client.chat.completions.create(
-            # CORRECTION : Utilisation du vrai modèle existant
-            model="gpt-4o-mini", 
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            # gpt-4o-mini SUPPORTE la température basse, ce qui aide à suivre le tuto date
-            temperature=0.1 
+            temperature=0.1
         )
         return json.loads(response.choices[0].message.content)
     except Exception as e:
@@ -127,19 +136,17 @@ def main():
     
     for event in events:
         evt_id = event['superevent_id']
-        
         if evt_id not in existing_ids:
             vulgarized = vulgarize_event(event)
-            
             if vulgarized:
                 new_entry = {
                     "id": evt_id,
-                    "date": event['created'], # Date de tri (technique)
-                    "display_date": vulgarized.get('date_readable'), # Date IA (Humaine)
+                    "date": event['created'],
+                    "display_date": vulgarized.get('date_readable'),
                     "title": vulgarized.get('title'),
                     "type": vulgarized.get('event_type'),
                     "summary": vulgarized.get('description'),
-                    "score": vulgarized.get('scientific_score', 5),
+                    "distance": vulgarized.get('distance', 'Inconnue'), # Nouveau champ
                     "url": event['links']['self']
                 }
                 new_entries.append(new_entry)
@@ -148,11 +155,10 @@ def main():
     if new_entries:
         updated_data = new_entries + existing_data
         updated_data.sort(key=lambda x: x['date'], reverse=True)
-        
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
             json.dump(updated_data, f, indent=2)
-        print(f"Mise à jour réussie : {len(new_entries)} événements ajoutés.")
+        print(f"Succès : {len(new_entries)} ajouts.")
     else:
         print("Aucun nouvel événement.")
 

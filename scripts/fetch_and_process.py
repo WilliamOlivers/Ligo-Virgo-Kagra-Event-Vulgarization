@@ -26,83 +26,81 @@ def fetch_gracedb_events():
         'Accept': 'application/json'
     }
     
-    # --- STRATÉGIE ROBUSTE ---
-    # On retire les guillemets et les symboles mathématiques (>) qui cassent l'URL.
-    # On demande juste : "Donne-moi ce qui est Production ET qui a envoyé une alerte".
+    # Requête simple et robuste pour récupérer les candidats
     query = 'category: Production label: GCN_PRELIM_SENT'
     
     params = {
         'query': query,
-        'count': 20,         # On prend les 20 derniers candidats sérieux
+        'count': 15,
         'order': '-created'
     }
     
-    print(f"Connexion à GraceDB avec filtre simplifié : [{query}]")
-    
+    print(f"Connexion à GraceDB...")
     try:
         response = requests.get(GRACEDB_URL, params=params, headers=headers)
-        
         if response.status_code == 200:
             data = response.json()
             events = data.get('superevents', data.get('results', []))
             
-            # --- FILTRAGE LOCAL (PYTHON) ---
-            # C'est ici qu'on applique la sécurité "O4" et "Retraction"
+            # Filtrage basique (O4 + Pas de Rétractation)
             valid_events = []
             for evt in events:
-                # 1. Filtre Rétractation (Fausse alarme)
                 labels = evt.get('labels', [])
-                if 'RETRACTION' in labels:
-                    continue
+                created = evt.get('created', '')
                 
-                # 2. Filtre Date (Run O4 a commencé fin Mai 2023)
-                # La date est au format ISO : "2023-05-29T..."
-                created_date = evt.get('created', '')
-                if created_date < "2023-05-24":
-                    continue
-                    
+                if 'RETRACTION' in labels: continue
+                if created < "2023-05-24": continue # Début O4
+                
                 valid_events.append(evt)
             
-            print(f"Succès : {len(valid_events)} événements O4 significatifs validés.")
             return valid_events
-        else:
-            print(f"ERREUR API ({response.status_code}) : {response.text}")
-            return []
-            
+        return []
     except Exception as e:
-        print(f"Exception lors du fetch : {e}")
+        print(f"Erreur Fetch: {e}")
         return []
 
 def vulgarize_event(event):
     evt_id = event['superevent_id']
-    
-    print(f">>> Vulgarisation de {evt_id}...")
-    
-    # Extraction sécurisée des données
     labels = event.get('labels', [])
     far = event.get('far', 'Non spécifié')
-    instruments = event.get('instruments', 'N/A')
-
-    prompt = f"""
-    Tu es un expert en astrophysique.
-    Sujet : Onde gravitationnelle CONFIRMÉE (ID: {evt_id}).
-    Labels: {labels}
-    Instruments: {instruments}
-    FAR: {far}
     
-    Tâche : Crée une fiche technique vulgarisée style Wikipédia/Grokipedia.
-    1. Titre : "Type (Date)". Ex: "Fusion de Trous Noirs (12 Mai 2023)".
-    2. Type : BBH (Trous Noirs), BNS (Étoiles à Neutrons), NSBH (Mixte). Si incertain: "Fusion Compacte".
-    3. Résumé : 40-50 mots max. Factuel, précis, scientifique mais clair.
-    4. Score : Importance scientifique /10 (BBH=6, BNS=9, Exceptionnel=10).
+    print(f">>> Vulgarisation de {evt_id}...")
 
-    JSON attendu :
+    # --- LE TUTORIEL INTÉGRÉ AU PROMPT ---
+    prompt = f"""
+    Tu es un expert en astrophysique et communication scientifique.
+    
+    CONTEXTE :
+    Tu dois analyser une onde gravitationnelle identifiée par l'ID : "{evt_id}".
+    Labels associés : {labels}
+    FAR (Fausse Alarme) : {far}
+
+    TUTORIEL POUR DÉCODER LA DATE (IMPORTANT) :
+    Les IDs GraceDB contiennent la date cachée. Format : [Prefix][YYMMDD][Suffix].
+    1. Ignore le préfixe (S, GW, MS...).
+    2. Prends les 6 premiers chiffres : ce sont YYMMDD.
+    3. Si YY est entre 00 et 79, l'année est 20YY. (Ex: 23 = 2023).
+    4. Convertis MM en nom de mois français.
+    
+    EXEMPLES :
+    - ID "S190425z" -> 190425 -> 25 Avril 2019.
+    - ID "GW170817" -> 170817 -> 17 Août 2017.
+    - ID "S230518h" -> 230518 -> 18 Mai 2023.
+
+    TACHE À RÉALISER (JSON) :
+    1. "title" : Crée un titre au format "Type d'événement (Date Décodée)". Ex: "Fusion de Trous Noirs (14 Mai 2023)".
+    2. "event_type" : Déduis le type (BBH, BNS, NSBH) d'après les labels ou la nature probable.
+    3. "date_readable" : La date que tu as décodée (ex: "14 Mai 2023").
+    4. "description" : Résumé de 40 mots max. Scientifique, précis, impactant.
+    5. "scientific_score" : Note d'importance /10 (BBH=6, BNS=9, Exceptionnel=10).
+
+    Réponds UNIQUEMENT via ce JSON :
     {{
         "title": "...",
-        "event_type": "BBH",
+        "event_type": "...",
         "date_readable": "...",
         "description": "...",
-        "scientific_score": 6
+        "scientific_score": 0
     }}
     """
 
@@ -111,7 +109,7 @@ def vulgarize_event(event):
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            temperature=0.1
+            temperature=0.1 # Température basse pour qu'il respecte strictement le tuto
         )
         return json.loads(response.choices[0].message.content)
     except Exception as e:
@@ -123,26 +121,21 @@ def main():
     existing_ids = {entry['id'] for entry in existing_data if 'id' in entry}
     
     events = fetch_gracedb_events()
-    
-    if not events:
-        print("Aucun événement à traiter.")
-        return
-
     new_entries = []
     
     for event in events:
         evt_id = event['superevent_id']
         
-        # On ne traite que les nouveaux ID
-        if evt_id not in existing_ids: 
+        if evt_id not in existing_ids:
             vulgarized = vulgarize_event(event)
+            
             if vulgarized:
                 new_entry = {
                     "id": evt_id,
-                    "date": event['created'],
+                    "date": event['created'], # Date de tri (technique)
+                    "display_date": vulgarized.get('date_readable'), # Date IA (Humaine)
                     "title": vulgarized.get('title'),
                     "type": vulgarized.get('event_type'),
-                    "readable_date": vulgarized.get('date_readable'),
                     "summary": vulgarized.get('description'),
                     "score": vulgarized.get('scientific_score', 5),
                     "url": event['links']['self']
@@ -151,17 +144,15 @@ def main():
                 existing_ids.add(evt_id)
     
     if new_entries:
-        # Fusion : Nouveaux + Anciens
         updated_data = new_entries + existing_data
-        # Tri : Du plus récent au plus vieux
         updated_data.sort(key=lambda x: x['date'], reverse=True)
         
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
             json.dump(updated_data, f, indent=2)
-        print(f"Base de données mise à jour : {len(new_entries)} événements ajoutés.")
+        print(f"Mise à jour réussie : {len(new_entries)} événements ajoutés.")
     else:
-        print("Base déjà à jour.")
+        print("Aucun nouvel événement.")
 
 if __name__ == "__main__":
     main()

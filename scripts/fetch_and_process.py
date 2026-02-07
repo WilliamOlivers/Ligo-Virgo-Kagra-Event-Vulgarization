@@ -23,55 +23,73 @@ def load_existing_data():
 def fetch_gracedb_events():
     headers = {'User-Agent': 'GrokipediaGW/1.0 (Educational)'}
     
-    # --- LA REQUÊTE EXACTE DU SITE "O4 SIGNIFICANT" ---
-    # Nous demandons à l'API de faire le tri pour nous.
-    # label="GCN_PRELIM_SENT" : Signifie que c'est une détection confirmée publique.
-    # created > 2023-05-24 : Date de début du run O4.
-    
-    query = 'category: "Production" label: "GCN_PRELIM_SENT" created > "2023-05-24"'
-    
+    # STRATÉGIE "FETCH WIDE" : On demande simplement tout ce qui est "Production"
+    # On augmente le count à 50 pour être sûr d'attraper les rares événements significatifs
+    # parmi le bruit.
     params = {
-        'query': query,
-        'count': 20,         # On récupère les 20 plus récents de cette liste d'élite
-        'order': '-created'  # Du plus récent au plus ancien
+        'query': 'category: Production', 
+        'count': 50,
+        'order': '-created'
     }
     
-    print(f"Interrogation de GraceDB avec filtre : {query}")
-    
+    print(f"Connexion à GraceDB (Récupération large)...")
     try:
         response = requests.get(GRACEDB_URL, params=params, headers=headers)
         if response.status_code == 200:
             data = response.json()
+            # Gestion de la structure de réponse variable (results vs superevents)
             events = data.get('superevents', data.get('results', []))
-            print(f"GraceDB a renvoyé {len(events)} événements significatifs.")
+            print(f"Brut : {len(events)} événements 'Production' récupérés.")
             return events
         else:
             print(f"Erreur API ({response.status_code}): {response.text}")
             return []
     except Exception as e:
-        print(f"Erreur de connexion: {e}")
+        print(f"Erreur Fetch: {e}")
         return []
+
+def is_significant_O4(event):
+    """
+    Filtre local pour déterminer si l'événement vaut le coup.
+    Critères : O4, Alertée envoyée, Pas de rétractation.
+    """
+    evt_id = event['superevent_id']
+    labels = event.get('labels', [])
+    
+    # 1. Vérifier si c'est O4 (L'ID commence par S23 ou S24...)
+    # O4 a commencé en mai 2023.
+    if not (evt_id.startswith('S23') or evt_id.startswith('S24') or evt_id.startswith('S25')):
+        # print(f"Ignoré {evt_id}: Pas O4")
+        return False
+
+    # 2. Vérifier si une alerte publique a été envoyée
+    if 'GCN_PRELIM_SENT' not in labels and 'GCN_NO_SKYMAP_SENT' not in labels:
+        # print(f"Ignoré {evt_id}: Pas d'alerte publique (Low Significance)")
+        return False
+
+    # 3. Vérifier s'il a été rétracté (Fausse alarme annulée)
+    if 'RETRACTION' in labels:
+        print(f"Ignoré {evt_id}: RÉTRACTÉ (Fausse alarme)")
+        return False
+
+    return True
 
 def vulgarize_event(event):
     evt_id = event['superevent_id']
     labels = event.get('labels', [])
+    far = event.get('far', 'Inconnu')
     
-    # Vérification ultime anti-rétractation (au cas où l'API en laisserait passer un)
-    if 'RETRACTION' in labels:
-        print(f"Skipping {evt_id} (Rétracté)")
-        return None
-
-    print(f">>> Vulgarisation de {evt_id}...")
+    print(f">>> Traitement IA de l'événement significatif : {evt_id}")
 
     prompt = f"""
-    Tu es un expert astrophysicien. Voici une onde gravitationnelle CONFIRMÉE du run O4 (ID: {evt_id}).
-    Labels: {labels}
+    Tu es un astrophysicien expert.
+    Données brutes : ID: {evt_id}, Labels: {labels}, FAR: {far}
     
-    Tâche : Crée une fiche technique vulgarisée.
-    1. Titre: "Type (Date)". Ex: "Fusion de Trous Noirs (14 Août 2023)".
-    2. Type: BBH (Trous noirs), BNS (Étoiles neutrons), NSBH (Mixte). Déduis-le.
-    3. Résumé: 40-50 mots. Explique la violence de l'événement et sa distance (lointain/proche).
-    4. Score: Note d'importance scientifique /10. (BBH=6, BNS=9, Exceptionnel=10).
+    Tâche : Crée une fiche technique pour cette onde gravitationnelle CONFIRMÉE.
+    1. Titre: "Type (Date)". Ex: "Fusion Trous Noirs (12 Mai 2023)".
+    2. Type: BBH (Trous Noirs), BNS (Étoiles Neutrons), ou NSBH.
+    3. Résumé: 40-50 mots, dense, scientifique, encyclopédique.
+    4. Score: Rareté/Importance sur 10. (BBH=6, BNS=9).
 
     JSON attendu :
     {{
@@ -99,10 +117,18 @@ def main():
     existing_data = load_existing_data()
     existing_ids = {entry['id'] for entry in existing_data if 'id' in entry}
     
-    events = fetch_gracedb_events()
-    new_entries = []
+    raw_events = fetch_gracedb_events()
+    significant_events = []
 
-    for event in events:
+    # ÉTAPE DE FILTRAGE LOCAL
+    for event in raw_events:
+        if is_significant_O4(event):
+            significant_events.append(event)
+    
+    print(f"Après filtrage : {len(significant_events)} événements significatifs à traiter/vérifier.")
+
+    new_entries = []
+    for event in significant_events:
         evt_id = event['superevent_id']
         
         if evt_id not in existing_ids:
@@ -121,16 +147,16 @@ def main():
                 new_entries.append(new_entry)
     
     if new_entries:
-        # Fusion et tri
         updated_data = new_entries + existing_data
+        # On trie par date décroissante pour être sûr
         updated_data.sort(key=lambda x: x['date'], reverse=True)
         
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
             json.dump(updated_data, f, indent=2)
-        print(f"Base de données mise à jour avec {len(new_entries)} événements majeurs.")
+        print(f"SUCCÈS : {len(new_entries)} ajoutés à la base.")
     else:
-        print("Base déjà à jour.")
+        print("Rien de nouveau à ajouter.")
 
 if __name__ == "__main__":
     main()

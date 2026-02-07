@@ -1,1 +1,152 @@
-
+[
+  {
+    "id": "S251117dq",
+    "date": "2025-11-17 21:38:45 UTC",
+    "display_date": "18 Novembre 2025",
+    "title": "Fusion de Trous Noirs (18 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses continuent pour affiner les caract\u00e9ristiques de l'\u00e9v\u00e9nement.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251117dq/"
+  },
+  {
+    "id": "S251116en",
+    "date": "2025-11-16 23:22:33 UTC",
+    "display_date": "17 Novembre 2025",
+    "title": "Fusion de Trous Noirs (17 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses sont en cours pour d\u00e9terminer les caract\u00e9ristiques de l'\u00e9v\u00e9nement.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251116en/"
+  },
+  {
+    "id": "S251112cm",
+    "date": "2025-11-12 15:19:32 UTC",
+    "display_date": "15 Novembre 2025",
+    "title": "Mise \u00e0 jour de l'\u00e9v\u00e9nement (15 Novembre 2025)",
+    "type": "Inconnu",
+    "summary": "Cette mise \u00e0 jour concerne l'\u00e9v\u00e9nement d'onde gravitationnelle S251112cm, avec des informations sur la classification et les propri\u00e9t\u00e9s de la source.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251112cm/"
+  },
+  {
+    "id": "S251108fi",
+    "date": "2025-11-08 19:13:41 UTC",
+    "display_date": "09 Novembre 2025",
+    "title": "Fusion de Trous Noirs (09 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une mise \u00e0 jour sur l'\u00e9v\u00e9nement S251108fi, indiquant une forte probabilit\u00e9 de fusion de trous noirs, avec des analyses en cours par LIGO, Virgo et KAGRA.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251108fi/"
+  },
+  {
+    "id": "S251108dn",
+    "date": "2025-11-08 10:32:56 UTC",
+    "display_date": "9 Novembre 2025",
+    "title": "Fusion de Trous Noirs (9 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. L'\u00e9v\u00e9nement a \u00e9t\u00e9 analys\u00e9 par plusieurs collaborations d'astronomie gravitationnelle.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251108dn/"
+  },
+  {
+    "id": "S251105aj",
+    "date": "2025-11-05 12:59:33 UTC",
+    "display_date": "07 Novembre 2025",
+    "title": "Fusion de Trous Noirs (07 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Cette onde gravitationnelle provient d'une fusion de trous noirs, avec une probabilit\u00e9 \u00e9lev\u00e9e de classification BBH. L'\u00e9v\u00e9nement a \u00e9t\u00e9 d\u00e9tect\u00e9 par LIGO, Virgo et KAGRA.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251105aj/"
+  },
+  {
+    "id": "S251103f",
+    "date": "2025-11-03 22:05:37 UTC",
+    "display_date": "7 Novembre 2025",
+    "title": "Fusion de Trous Noirs (7 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs, avec une probabilit\u00e9 \u00e9lev\u00e9e de classification BBH.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251103f/"
+  },
+  {
+    "id": "S251031cq",
+    "date": "2025-10-31 18:59:29 UTC",
+    "display_date": "03 Novembre 2025",
+    "title": "Fusion de Trous Noirs (03 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses continuent pour affiner les d\u00e9tails de l'\u00e9v\u00e9nement.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251031cq/"
+  },
+  {
+    "id": "S251026bn",
+    "date": "2025-10-26 21:16:16 UTC",
+    "display_date": "27 Octobre 2025",
+    "title": "Fusion de Trous Noirs (27 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses continuent pour affiner les caract\u00e9ristiques de l'\u00e9v\u00e9nement.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251026bn/"
+  },
+  {
+    "id": "S251021u",
+    "date": "2025-10-21 03:22:28 UTC",
+    "display_date": "21 Octobre 2025",
+    "title": "Fusion de Trous Noirs (21 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses indiquent une probabilit\u00e9 \u00e9lev\u00e9e pour cette classification.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251021u/"
+  },
+  {
+    "id": "S251018bi",
+    "date": "2025-10-18 15:25:57 UTC",
+    "display_date": "20 Octobre 2025",
+    "title": "Fusion de Trous Noirs (20 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle significative a \u00e9t\u00e9 d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs. Les analyses continuent pour affiner les caract\u00e9ristiques de l'\u00e9v\u00e9nement.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251018bi/"
+  },
+  {
+    "id": "S251014cn",
+    "date": "2025-10-14 11:33:36 UTC",
+    "display_date": "15 Octobre 2025",
+    "title": "Fusion de Trous Noirs (15 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs, avec une probabilit\u00e9 de 99.82%.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251014cn/"
+  },
+  {
+    "id": "S251013x",
+    "date": "2025-10-13 02:44:25 UTC",
+    "display_date": "13 Octobre 2025",
+    "title": "Fusion de Trous Noirs (13 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs, a \u00e9t\u00e9 signal\u00e9e par les collaborations LIGO, Virgo et KAGRA.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251013x/"
+  },
+  {
+    "id": "S251006dd",
+    "date": "2025-10-06 23:37:35 UTC",
+    "display_date": "07 Octobre 2025",
+    "title": "Fusion de Trous Noirs (07 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs, avec une probabilit\u00e9 de 99.73%.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S251006dd/"
+  },
+  {
+    "id": "S250929c",
+    "date": "2025-09-29 00:27:45 UTC",
+    "display_date": "29 Septembre 2025",
+    "title": "Fusion de Trous Noirs (29 Septembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, probablement due \u00e0 la fusion de deux trous noirs, avec une probabilit\u00e9 \u00e9lev\u00e9e de classification BBH.",
+    "distance": "Inconnue",
+    "url": "https://gracedb.ligo.org/api/superevents/S250929c/"
+  }
+]

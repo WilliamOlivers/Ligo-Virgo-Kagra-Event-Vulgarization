@@ -26,78 +26,64 @@ def fetch_gracedb_events():
         'Accept': 'application/json'
     }
     
-    # --- LA REQUÊTE CIBLÉE ---
-    # Pour obtenir la liste "O4 Significant Detection Candidates" (les ~254 events) :
-    # 1. public: True -> Visible sans authentification
-    # 2. category: "Production" -> Pas de tests
-    # 3. label: "GCN_PRELIM_SENT" -> Preuve qu'une alerte "Significative" a été envoyée
-    # 4. created > 2023-05-24 -> Début du run O4
+    # --- CORRECTION DE LA REQUÊTE ---
+    # On a retiré "public: True" qui causait l'erreur 400.
+    # On garde les critères stricts pour les événements significatifs O4.
+    # Note : Les guillemets autour des valeurs sont importants pour l'API.
     
-    # Note: On encode explicitement la requête pour éviter les erreurs d'URL
-    query_string = 'public: True category: "Production" label: "GCN_PRELIM_SENT" created > "2023-05-24"'
+    query = 'category: "Production" label: "GCN_PRELIM_SENT" created > "2023-05-24"'
     
     params = {
-        'query': query_string,
-        'count': 10,         # On commence par les 10 plus récents pour tester
+        'query': query,
+        'count': 15,         # On prend les 15 derniers pour être sûr
         'order': '-created'
     }
     
-    print(f"Connexion à GraceDB avec filtre : [{query_string}]")
+    print(f"Connexion à GraceDB avec filtre : [{query}]")
     
     try:
         response = requests.get(GRACEDB_URL, params=params, headers=headers)
         
-        # DEBUG : Si ça échoue, on veut savoir pourquoi
-        if response.status_code != 200:
-            print(f"ERREUR API ({response.status_code}) : {response.text}")
-            # Tentative de fallback sur une requête plus simple si la première échoue
-            print("Tentative de requête simplifiée...")
-            params['query'] = 'public: True category: "Production" created > "2023-05-24"'
-            response = requests.get(GRACEDB_URL, params=params, headers=headers)
-        
         if response.status_code == 200:
             data = response.json()
-            # GraceDB renvoie parfois 'superevents' ou directement la liste dans 'results' selon la version de l'API visée
+            # L'API publique renvoie généralement une clé 'superevents'
             events = data.get('superevents', data.get('results', []))
             
-            # Filtrage manuel ultime pour être sûr de ne pas avoir de Rétractation
+            # Filtrage de sécurité : on retire les rétractations
             valid_events = []
             for evt in events:
                 labels = evt.get('labels', [])
+                # Si 'RETRACTION' est dans les labels, c'est une fausse alarme
                 if 'RETRACTION' not in labels:
                     valid_events.append(evt)
             
-            print(f"Succès : {len(valid_events)} événements significatifs récupérés (sur {len(events)} bruts).")
+            print(f"Succès : {len(valid_events)} événements significatifs récupérés.")
             return valid_events
         else:
-            print(f"Échec total API : {response.text}")
+            print(f"ERREUR API ({response.status_code}) : {response.text}")
             return []
             
     except Exception as e:
-        print(f"Exception critique lors du fetch : {e}")
+        print(f"Exception lors du fetch : {e}")
         return []
 
 def vulgarize_event(event):
     evt_id = event['superevent_id']
-    
-    # On ignore les événements déjà traités pour économiser les tokens OpenAI, 
-    # mais ici on veut regénérer la DB donc on traite tout ce qui est passé.
-    
     labels = event.get('labels', [])
     far = event.get('far', 'Non spécifié')
     
     print(f">>> Vulgarisation de {evt_id}...")
 
     prompt = f"""
-    Tu es un expert en astrophysique pour le grand public.
+    Tu es un expert en astrophysique.
     Sujet : Onde gravitationnelle confirmée (ID: {evt_id}).
     Labels: {labels}
-    FAR (Fausse Alarme): {far}
+    FAR: {far}
     
-    Tâche : Crée une fiche technique claire et captivante.
-    1. Titre : Type d'événement + Date. Ex: "Fusion de Trous Noirs (12 Mai 2023)".
-    2. Type : BBH (Trous Noirs), BNS (Étoiles à Neutrons), ou NSBH (Mixte).
-    3. Résumé : 40 mots max. L'essentiel : c'est quoi ? C'est loin ? C'est violent ?
+    Tâche : Crée une fiche technique vulgarisée style Wikipédia.
+    1. Titre : "Type (Date)". Ex: "Fusion de Trous Noirs (12 Mai 2023)".
+    2. Type : BBH (Trous Noirs), BNS (Étoiles à Neutrons), NSBH (Mixte).
+    3. Résumé : 40 mots max. L'essentiel, le plus factuel possible.
     4. Score : Importance scientifique /10 (BBH=6, BNS=9, Exceptionnel=10).
 
     JSON attendu :
@@ -123,13 +109,15 @@ def vulgarize_event(event):
         return None
 
 def main():
+    # On charge l'existant pour éviter les doublons, 
+    # mais pour ce test, on peut vouloir tout rafraîchir.
     existing_data = load_existing_data()
     existing_ids = {entry['id'] for entry in existing_data if 'id' in entry}
     
     events = fetch_gracedb_events()
     
     if not events:
-        print("ATTENTION: Liste vide retournée par GraceDB. Vérifiez les logs ci-dessus.")
+        print("Aucun événement trouvé. Vérifiez la requête.")
         return
 
     new_entries = []
@@ -137,8 +125,8 @@ def main():
     for event in events:
         evt_id = event['superevent_id']
         
-        # Pour le développement, on traite même si ça existe déjà pour mettre à jour le format
-        if evt_id not in existing_ids or True: 
+        # Condition pour traiter seulement les nouveaux (ou tout le monde si on vide le JSON avant)
+        if evt_id not in existing_ids: 
             vulgarized = vulgarize_event(event)
             if vulgarized:
                 new_entry = {
@@ -152,22 +140,20 @@ def main():
                     "url": event['links']['self']
                 }
                 new_entries.append(new_entry)
-                # On ajoute à existing_ids pour éviter doublon dans la boucle
                 existing_ids.add(evt_id)
     
     if new_entries:
-        # On remplace la base ou on l'étend. Ici on recrée une base propre avec les 10 derniers.
-        # Pour la prod, il faudra changer la logique pour "append".
-        
-        # Tri par date décroissante
-        new_entries.sort(key=lambda x: x['date'], reverse=True)
+        # On ajoute les nouveaux en tête de liste
+        updated_data = new_entries + existing_data
+        # Tri par date décroissante pour être propre
+        updated_data.sort(key=lambda x: x['date'], reverse=True)
         
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
-            json.dump(new_entries, f, indent=2)
-        print(f"Base de données générée avec succès : {len(new_entries)} événements.")
+            json.dump(updated_data, f, indent=2)
+        print(f"Base de données mise à jour : {len(new_entries)} nouveaux événements ajoutés.")
     else:
-        print("Aucun événement traité.")
+        print("Base déjà à jour, rien de nouveau.")
 
 if __name__ == "__main__":
     main()

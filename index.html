@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GW Events | Vulgarisé</title>
+    <title>Grokipedia GW | Archives O4</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header>
-        <div class="logo">GW_ARCHIVE // VULGARISÉ</div>
-        <div class="status">Flux: <span class="blink">LIVE</span></div>
+        <div class="header-content">
+            <div class="logo">
+                <span class="symbol">◎</span> GROKIPEDIA_GW
+            </div>
+            <div class="status">
+                RUN O4 <span class="blink">●</span> EN DIRECT
+            </div>
+        </div>
     </header>
 
-    <main id="feed">
-        <div class="loading">Chargement des ondes gravitationnelles...</div>
+    <main>
+        <div id="feed" class="grid-container">
+            <div class="loader">Initialisation du flux de données...</div>
+        </div>
     </main>
 
     <footer>
-        <p>Données issues de GraceDB • Traitées par OpenAI</p>
+        <p>Données issues de LIGO/Virgo/KAGRA (GraceDB) • Vulgarisées par IA</p>
     </footer>
 
     <script src="script.js"></script>

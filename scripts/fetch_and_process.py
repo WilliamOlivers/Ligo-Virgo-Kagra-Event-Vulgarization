@@ -26,7 +26,7 @@ def fetch_gracedb_events():
         'Accept': 'application/json'
     }
     
-    # Requête simple et robuste pour récupérer les candidats
+    # Requête simple et robuste
     query = 'category: Production label: GCN_PRELIM_SENT'
     
     params = {
@@ -106,10 +106,12 @@ def vulgarize_event(event):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-5-nano",
+            # CORRECTION : Utilisation du vrai modèle existant
+            model="gpt-4o-mini", 
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            temperature=0.1 # Température basse pour qu'il respecte strictement le tuto
+            # gpt-4o-mini SUPPORTE la température basse, ce qui aide à suivre le tuto date
+            temperature=0.1 
         )
         return json.loads(response.choices[0].message.content)
     except Exception as e:

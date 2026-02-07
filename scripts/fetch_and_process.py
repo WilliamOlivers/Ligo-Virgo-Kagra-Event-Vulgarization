@@ -26,38 +26,44 @@ def fetch_gracedb_events():
         'Accept': 'application/json'
     }
     
-    # --- CORRECTION DE LA REQUÊTE ---
-    # On a retiré "public: True" qui causait l'erreur 400.
-    # On garde les critères stricts pour les événements significatifs O4.
-    # Note : Les guillemets autour des valeurs sont importants pour l'API.
-    
-    query = 'category: "Production" label: "GCN_PRELIM_SENT" created > "2023-05-24"'
+    # --- STRATÉGIE ROBUSTE ---
+    # On retire les guillemets et les symboles mathématiques (>) qui cassent l'URL.
+    # On demande juste : "Donne-moi ce qui est Production ET qui a envoyé une alerte".
+    query = 'category: Production label: GCN_PRELIM_SENT'
     
     params = {
         'query': query,
-        'count': 15,         # On prend les 15 derniers pour être sûr
+        'count': 20,         # On prend les 20 derniers candidats sérieux
         'order': '-created'
     }
     
-    print(f"Connexion à GraceDB avec filtre : [{query}]")
+    print(f"Connexion à GraceDB avec filtre simplifié : [{query}]")
     
     try:
         response = requests.get(GRACEDB_URL, params=params, headers=headers)
         
         if response.status_code == 200:
             data = response.json()
-            # L'API publique renvoie généralement une clé 'superevents'
             events = data.get('superevents', data.get('results', []))
             
-            # Filtrage de sécurité : on retire les rétractations
+            # --- FILTRAGE LOCAL (PYTHON) ---
+            # C'est ici qu'on applique la sécurité "O4" et "Retraction"
             valid_events = []
             for evt in events:
+                # 1. Filtre Rétractation (Fausse alarme)
                 labels = evt.get('labels', [])
-                # Si 'RETRACTION' est dans les labels, c'est une fausse alarme
-                if 'RETRACTION' not in labels:
-                    valid_events.append(evt)
+                if 'RETRACTION' in labels:
+                    continue
+                
+                # 2. Filtre Date (Run O4 a commencé fin Mai 2023)
+                # La date est au format ISO : "2023-05-29T..."
+                created_date = evt.get('created', '')
+                if created_date < "2023-05-24":
+                    continue
+                    
+                valid_events.append(evt)
             
-            print(f"Succès : {len(valid_events)} événements significatifs récupérés.")
+            print(f"Succès : {len(valid_events)} événements O4 significatifs validés.")
             return valid_events
         else:
             print(f"ERREUR API ({response.status_code}) : {response.text}")
@@ -69,21 +75,25 @@ def fetch_gracedb_events():
 
 def vulgarize_event(event):
     evt_id = event['superevent_id']
-    labels = event.get('labels', [])
-    far = event.get('far', 'Non spécifié')
     
     print(f">>> Vulgarisation de {evt_id}...")
+    
+    # Extraction sécurisée des données
+    labels = event.get('labels', [])
+    far = event.get('far', 'Non spécifié')
+    instruments = event.get('instruments', 'N/A')
 
     prompt = f"""
     Tu es un expert en astrophysique.
-    Sujet : Onde gravitationnelle confirmée (ID: {evt_id}).
+    Sujet : Onde gravitationnelle CONFIRMÉE (ID: {evt_id}).
     Labels: {labels}
+    Instruments: {instruments}
     FAR: {far}
     
-    Tâche : Crée une fiche technique vulgarisée style Wikipédia.
+    Tâche : Crée une fiche technique vulgarisée style Wikipédia/Grokipedia.
     1. Titre : "Type (Date)". Ex: "Fusion de Trous Noirs (12 Mai 2023)".
-    2. Type : BBH (Trous Noirs), BNS (Étoiles à Neutrons), NSBH (Mixte).
-    3. Résumé : 40 mots max. L'essentiel, le plus factuel possible.
+    2. Type : BBH (Trous Noirs), BNS (Étoiles à Neutrons), NSBH (Mixte). Si incertain: "Fusion Compacte".
+    3. Résumé : 40-50 mots max. Factuel, précis, scientifique mais clair.
     4. Score : Importance scientifique /10 (BBH=6, BNS=9, Exceptionnel=10).
 
     JSON attendu :
@@ -109,15 +119,13 @@ def vulgarize_event(event):
         return None
 
 def main():
-    # On charge l'existant pour éviter les doublons, 
-    # mais pour ce test, on peut vouloir tout rafraîchir.
     existing_data = load_existing_data()
     existing_ids = {entry['id'] for entry in existing_data if 'id' in entry}
     
     events = fetch_gracedb_events()
     
     if not events:
-        print("Aucun événement trouvé. Vérifiez la requête.")
+        print("Aucun événement à traiter.")
         return
 
     new_entries = []
@@ -125,7 +133,7 @@ def main():
     for event in events:
         evt_id = event['superevent_id']
         
-        # Condition pour traiter seulement les nouveaux (ou tout le monde si on vide le JSON avant)
+        # On ne traite que les nouveaux ID
         if evt_id not in existing_ids: 
             vulgarized = vulgarize_event(event)
             if vulgarized:
@@ -143,17 +151,17 @@ def main():
                 existing_ids.add(evt_id)
     
     if new_entries:
-        # On ajoute les nouveaux en tête de liste
+        # Fusion : Nouveaux + Anciens
         updated_data = new_entries + existing_data
-        # Tri par date décroissante pour être propre
+        # Tri : Du plus récent au plus vieux
         updated_data.sort(key=lambda x: x['date'], reverse=True)
         
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
         with open(DATA_FILE, 'w') as f:
             json.dump(updated_data, f, indent=2)
-        print(f"Base de données mise à jour : {len(new_entries)} nouveaux événements ajoutés.")
+        print(f"Base de données mise à jour : {len(new_entries)} événements ajoutés.")
     else:
-        print("Base déjà à jour, rien de nouveau.")
+        print("Base déjà à jour.")
 
 if __name__ == "__main__":
     main()

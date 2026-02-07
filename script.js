@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Ex: "Fusion (Date Indéterminée)" -> "Fusion"
      */
     function cleanTitle(title) {
-        return title.replace(/\s*\(Date.*?\)/i, '').trim();
+        return title.replace(/\s*\(.*?\)$/, '').trim();
     }
 
     /**
@@ -45,10 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function getTypeInfo(typeString) {
         const t = typeString.toLowerCase();
         if (t.includes('bbh') || t.includes('trous noirs')) {
-            return { class: 'bbh', label: 'TR. NOIRS' };
+            return { class: 'bbh', label: 'BLACK HOLES' };
         }
         if (t.includes('bns') || t.includes('neutrons')) {
-            return { class: 'bns', label: 'NEUTRONS' };
+            return { class: 'bns', label: 'NEUTRON STARS' };
         }
         if (t.includes('nsbh')) {
             return { class: 'mix', label: 'MIXTE' };

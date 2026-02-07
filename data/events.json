@@ -1,1 +1,152 @@
-
+[
+  {
+    "id": "S251117dq",
+    "date": "2025-11-17 21:38:45 UTC",
+    "display_date": "17 Novembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (17 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une fusion de trous noirs. L'analyse pr\u00e9liminaire indique une faible significativit\u00e9, mais des observations \u00e9lectromagn\u00e9tiques sont pr\u00eates pour confirmation.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251117dq/"
+  },
+  {
+    "id": "S251116en",
+    "date": "2025-11-16 23:22:33 UTC",
+    "display_date": "16 Novembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (16 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une possible fusion de trous noirs. Les donn\u00e9es pr\u00e9liminaires indiquent une faible probabilit\u00e9 de fausse alarme, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251116en/"
+  },
+  {
+    "id": "S251112cm",
+    "date": "2025-11-12 15:19:32 UTC",
+    "display_date": "11 D\u00e9cembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (11 D\u00e9cembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement issue de la fusion de trous noirs, a \u00e9t\u00e9 identifi\u00e9e avec une faible probabilit\u00e9 de fausse alarme, indiquant un \u00e9v\u00e9nement astrophysique significatif.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251112cm/"
+  },
+  {
+    "id": "S251108fi",
+    "date": "2025-11-08 19:13:41 UTC",
+    "display_date": "08 Novembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (08 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement issue de la fusion de trous noirs, avec une faible probabilit\u00e9 de fausse alarme, indiquant un \u00e9v\u00e9nement astrophysique significatif.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251108fi/"
+  },
+  {
+    "id": "S251108dn",
+    "date": "2025-11-08 10:32:56 UTC",
+    "display_date": "08 Novembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (08 Novembre 2025)",
+    "type": "BBH",
+    "summary": "L'onde gravitationnelle S251108dn a \u00e9t\u00e9 d\u00e9tect\u00e9e avec une faible fausse alarme, sugg\u00e9rant une fusion de trous noirs. Les donn\u00e9es pr\u00e9liminaires indiquent une importance significative pour la recherche en astrophysique.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251108dn/"
+  },
+  {
+    "id": "S251105aj",
+    "date": "2025-11-05 12:59:33 UTC",
+    "display_date": "05 Novembre 2021",
+    "title": "\u00c9v\u00e9nement Gravitationnel (05 Novembre 2021)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement due \u00e0 la fusion de deux \u00e9toiles \u00e0 neutrons, avec une faible probabilit\u00e9 de fausse alarme. Les donn\u00e9es sont pr\u00eates pour l'analyse \u00e9lectromagn\u00e9tique.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S251105aj/"
+  },
+  {
+    "id": "S251103f",
+    "date": "2025-11-03 22:05:37 UTC",
+    "display_date": "03 Novembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (03 Novembre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une fusion de trous noirs. Les donn\u00e9es pr\u00e9liminaires indiquent une faible probabilit\u00e9 de fausse alarme, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement pour l'astrophysique.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251103f/"
+  },
+  {
+    "id": "S251031cq",
+    "date": "2025-10-31 18:59:29 UTC",
+    "display_date": "31 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (31 Octobre 2025)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement due \u00e0 la fusion de deux \u00e9toiles \u00e0 neutrons, avec une faible probabilit\u00e9 de fausse alarme. Les donn\u00e9es sont pr\u00eates pour une analyse approfondie.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S251031cq/"
+  },
+  {
+    "id": "S251026bn",
+    "date": "2025-10-26 21:16:16 UTC",
+    "display_date": "26 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (26 Octobre 2025)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une possible fusion d'\u00e9toiles \u00e0 neutrons. Les donn\u00e9es pr\u00e9liminaires indiquent une faible probabilit\u00e9 de fausse alarme, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S251026bn/"
+  },
+  {
+    "id": "S251021u",
+    "date": "2025-10-21 03:22:28 UTC",
+    "display_date": "21 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (21 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une fusion de trous noirs. L'analyse pr\u00e9liminaire indique une faible probabilit\u00e9 de fausse alarme, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement dans l'\u00e9tude des astrophysiques.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251021u/"
+  },
+  {
+    "id": "S251018bi",
+    "date": "2025-10-18 15:25:57 UTC",
+    "display_date": "18 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (18 Octobre 2025)",
+    "type": "BBH",
+    "summary": "L'onde gravitationnelle S251018bi a \u00e9t\u00e9 d\u00e9tect\u00e9e avec une faible fausse alarme, sugg\u00e9rant une fusion de trous noirs. Les donn\u00e9es pr\u00e9liminaires indiquent un \u00e9v\u00e9nement significatif pour l'astrophysique.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251018bi/"
+  },
+  {
+    "id": "S251014cn",
+    "date": "2025-10-14 11:33:36 UTC",
+    "display_date": "14 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (14 Octobre 2025)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement li\u00e9e \u00e0 la fusion de deux \u00e9toiles \u00e0 neutrons, avec une faible probabilit\u00e9 de fausse alarme. Analyse en cours pour d\u00e9terminer les implications astrophysiques.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S251014cn/"
+  },
+  {
+    "id": "S251013x",
+    "date": "2025-10-13 02:44:25 UTC",
+    "display_date": "13 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (13 Octobre 2025)",
+    "type": "BBH",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une possible fusion de trous noirs. Les donn\u00e9es pr\u00e9liminaires indiquent une faible probabilit\u00e9 de fausse alarme, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement.",
+    "score": 6,
+    "url": "https://gracedb.ligo.org/api/superevents/S251013x/"
+  },
+  {
+    "id": "S251006dd",
+    "date": "2025-10-06 23:37:35 UTC",
+    "display_date": "06 Octobre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (06 Octobre 2025)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, potentiellement issue d'une fusion de deux \u00e9toiles \u00e0 neutrons, a \u00e9t\u00e9 identifi\u00e9e avec une faible fausse alarme, indiquant un \u00e9v\u00e9nement astrophysique significatif.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S251006dd/"
+  },
+  {
+    "id": "S250929c",
+    "date": "2025-09-29 00:27:45 UTC",
+    "display_date": "29 Septembre 2025",
+    "title": "\u00c9v\u00e9nement Gravitationnel (29 Septembre 2025)",
+    "type": "BNS",
+    "summary": "Une onde gravitationnelle d\u00e9tect\u00e9e, signalant une possible fusion de deux \u00e9toiles \u00e0 neutrons. Les donn\u00e9es pr\u00e9liminaires indiquent une co\u00efncidence \u00e9lectromagn\u00e9tique, renfor\u00e7ant l'importance de cet \u00e9v\u00e9nement dans l'astrophysique moderne.",
+    "score": 9,
+    "url": "https://gracedb.ligo.org/api/superevents/S250929c/"
+  }
+]

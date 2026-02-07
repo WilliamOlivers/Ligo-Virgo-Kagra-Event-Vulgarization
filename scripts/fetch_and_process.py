@@ -106,7 +106,7 @@ def vulgarize_event(event):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.1 # Température basse pour qu'il respecte strictement le tuto

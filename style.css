@@ -1,132 +1,180 @@
 :root {
-    --bg-color: #f4f4f0; /* Papier blanc cassé */
-    --text-color: #1a1a1a;
-    --accent-color: #3d5afe; /* Bleu électrique subtil */
+    --bg-color: #f8f9fa;
     --card-bg: #ffffff;
-    --border: 1px solid #e0e0e0;
+    --text-main: #1a1a1a;
+    --text-secondary: #5e6c84;
+    --accent: #2c3e50;
+    --border: #e1e4e8;
+    
+    /* Couleurs de badges */
+    --color-bbh: #2d3436;   /* Noir charbon pour les trous noirs */
+    --color-bns: #d63031;   /* Rouge pour les étoiles à neutrons */
+    --color-mix: #0984e3;   /* Bleu pour les mélanges */
+    --color-def: #636e72;   /* Gris par défaut */
 }
 
 body {
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: var(--text-main);
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
+/* Header minimaliste */
 header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    padding: 2rem;
-    border-bottom: var(--border);
+    align-items: center;
     font-family: 'Space Mono', monospace;
 }
 
-.blink {
-    animation: blinker 1.5s linear infinite;
-    color: green;
-    font-weight: bold;
-}
-
+.symbol { font-size: 1.5rem; vertical-align: middle; margin-right: 0.5rem; }
+.blink { color: #00b894; animation: blinker 2s linear infinite; }
 @keyframes blinker { 50% { opacity: 0; } }
 
+/* Grille principale */
 main {
-    max-width: 800px;
-    margin: 3rem auto;
+    max-width: 1200px;
+    margin: 2rem auto;
     padding: 0 1rem;
 }
 
-.event-card {
-    background: var(--card-bg);
-    border: var(--border);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.05); /* Ombre dure minimaliste */
-    transition: transform 0.2s ease;
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
 }
 
-.event-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
-}
-
-.meta {
+.loader {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
     font-family: 'Space Mono', monospace;
-    font-size: 0.85rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+}
+
+/* Carte Événement */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border-color: var(--text-secondary);
+}
+
+/* En-tête de carte : Badge + Date */
+.card-header {
     display: flex;
     justify-content: space-between;
-}
-
-h2 {
+    align-items: center;
+    margin-bottom: 1rem;
     font-family: 'Space Mono', monospace;
-    margin: 0.5rem 0 1rem 0;
-    font-size: 1.5rem;
-}
-
-.score-bar {
-    height: 4px;
-    background: #eee;
-    margin-top: 1.5rem;
-    position: relative;
-}
-
-.score-fill {
-    height: 100%;
-    background: var(--accent-color);
-    display: block;
-}
-
-.raw-link {
-    display: inline-block;
-    margin-top: 1rem;
     font-size: 0.8rem;
-    text-decoration: none;
-    color: var(--accent-color);
-    border-bottom: 1px solid transparent;
 }
 
-.raw-link:hover {
-    border-bottom-color: var(--accent-color);
-}
-/* Ajout pour les badges de type */
 .badge {
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold;
+    color: white;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
 }
 
-/* Couleurs spécifiques selon le type (géré par la classe ajoutée en JS) */
-.badge.BBH { background-color: #e0e0e0; color: #333; border: 1px solid #999; } /* Trous noirs = sombre/neutre */
-.badge.BNS { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; } /* Neutrons = Or (Kilonova) */
-.badge.Terrestrial { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; } /* Bruit = Rouge */
+.date {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
 
-.details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1.5rem;
+/* Contenu */
+h2 {
+    font-size: 1.25rem;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.summary {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    flex-grow: 1; /* Pousse le footer vers le bas */
+    margin-bottom: 1.5rem;
+}
+
+/* Métadonnées techniques */
+.card-footer {
+    border-top: 1px solid var(--bg-color);
     padding-top: 1rem;
-    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
-.detail-item {
+.meta-group {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
-.detail-item .label {
-    font-size: 0.7rem;
-    color: #888;
+.meta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #aaa;
     text-transform: uppercase;
 }
 
-.detail-item .value {
+.meta-value {
     font-family: 'Space Mono', monospace;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* Jauge de score */
+.score-dots {
+    display: flex;
+    gap: 2px;
+}
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #eee;
+}
+.dot.active { background-color: var(--accent); }
+
+/* Lien source */
+.source-link {
+    text-decoration: none;
+    color: var(--bg-color); /* Caché visuellement mais accessible */
+    position: relative;
+}
+.card:hover h2 { color: var(--accent); }
+
+/* Responsive Mobile */
+@media (max-width: 600px) {
+    .grid-container { grid-template-columns: 1fr; }
+    header { padding: 1rem; }
 }
